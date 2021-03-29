@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Text, View } from 'react-native';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { ActivityIndicator, Image, Text, View } from 'react-native';
+import { TextInput, TouchableOpacity, FlatList } from 'react-native-gesture-handler';
 import { capitalize } from '../../helpers';
 import api from '../../services/api';
 
@@ -15,14 +15,22 @@ const Home: React.FC = () => {
   const [searchPokemon, setSearchPokemon] = useState<string>('');
   const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
 
-  useEffect(() => {
-    api.get('/pokemon?limit=10').then(
+  const [offset, setOffset] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const getPokemons = () => {
+    api.get(`/pokemon?limit=10&offset=${offset}`).then(
       (result) => {
-        setPokemonList(result.data.results);
+        setPokemonList(pokemonList => pokemonList.concat(result.data.results));
       }
     );
-  }, [])
+  }
 
+  useEffect(() => {
+    getPokemons();
+  }, [offset]);
+
+  console.log(pokemonList);
 
   const renderPokemon = (result: { item: Pokemon }) => (
     <TouchableOpacity style={{
@@ -51,8 +59,17 @@ const Home: React.FC = () => {
       </SearchBar>
 
       <FlatList
+        keyExtractor={(item) => item.name}
         data={pokemonList}
         renderItem={renderPokemon}
+        onEndReachedThreshold={0}
+        onEndReached={({distanceFromEnd}) => {
+          setTimeout(() => {
+            setLoading(true);
+            setOffset(offset + 10);
+          }, 1500)
+        }}
+        ListFooterComponent={() => <ActivityIndicator />}
       />
 
     </Container>
