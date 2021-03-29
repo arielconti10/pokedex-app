@@ -1,10 +1,22 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 
-// import { Container } from './styles';
+import { Container, SearchBar, Title } from './styles';
 
 const Home: React.FC = () => {
-  return <View />;
+  return (
+    <Container>
+      <Title>Pokedéx</Title>
+
+      <SearchBar>
+        <TextInput placeholder="Search" placeholderTextColor="#fff" />
+      </SearchBar>
+
+    </Container>
+  );
 }
 
 export default Home;
+
+
