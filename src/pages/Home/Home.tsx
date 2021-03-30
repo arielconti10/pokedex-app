@@ -1,36 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, View } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { ActivityIndicator, Image, Text } from 'react-native';
 import { TextInput, TouchableOpacity, FlatList } from 'react-native-gesture-handler';
+import debounce from 'lodash.debounce';
+
 import { capitalize } from '../../helpers';
 import api from '../../services/api';
 
 import { Container, SearchBar, Title } from './styles';
+import { DebouncedFunc } from 'lodash';
 
 interface Pokemon{
   name: string,
   url: string
 }
 
+function useDebounce<T>(
+  callback: any,
+  delay: number
+): DebouncedFunc<any> {
+	const debouncedFn = useCallback(
+		debounce((...args) => callback(...args), delay),
+		[delay], // will recreate if delay changes
+	);
+	return debouncedFn;
+}
+
 const Home: React.FC = () => {
-  const [searchPokemon, setSearchPokemon] = useState<string>('');
-  const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
+  const [searchString, setSearchString] = useState<string>('');
+
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+	const debouncedSave = useDebounce(nextValue => setDebouncedSearch(nextValue), 1000);
 
   const [offset, setOffset] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
+  const [searchedPokemon, setSearchedPokemon] = useState([]);
+
   const getPokemons = () => {
-    api.get(`/pokemon?limit=10&offset=${offset}`).then(
+    api.get(`pokemon?limit=10&offset=${offset}`).then(
       (result) => {
         setPokemonList(pokemonList => pokemonList.concat(result.data.results));
       }
     );
   }
-
-  useEffect(() => {
-    getPokemons();
-  }, [offset]);
-
-  console.log(pokemonList);
 
   const renderPokemon = (result: { item: Pokemon }) => (
     <TouchableOpacity style={{
@@ -50,12 +63,40 @@ const Home: React.FC = () => {
     </TouchableOpacity>
   );
 
+  const searchPokemon = () => {
+    if(debouncedSearch){
+      api.get(`pokemon/${debouncedSearch}`).then(result => {
+        console.log(result.data)
+      }).catch(error => console.log(error));
+    }
+  }
+
+  const handleChangeSearch = (value: string) => {
+    setSearchString(value);
+    debouncedSave(value);
+  }
+
+  useEffect(() => {
+    getPokemons();
+  }, [offset]);
+
+  useEffect(() => {
+    searchPokemon();
+  }, [debouncedSearch])
+
   return (
     <Container>
       <Title>Pokedéx</Title>
 
       <SearchBar>
-        <TextInput style={{color: '#FFF'}} value={searchPokemon} placeholder="Search" placeholderTextColor="#fff" onChangeText={(value) => setSearchPokemon(value)}/>
+        <TextInput
+          autoCapitalize="none"
+          style={{color: '#FFF'}}
+          value={searchString}
+          placeholder="Search"
+          placeholderTextColor="#fff"
+          onChangeText={(value) => handleChangeSearch(value)}
+        />
       </SearchBar>
 
       <FlatList
@@ -63,7 +104,7 @@ const Home: React.FC = () => {
         data={pokemonList}
         renderItem={renderPokemon}
         onEndReachedThreshold={0}
-        onEndReached={({distanceFromEnd}) => {
+        onEndReached={() => {
           setTimeout(() => {
             setLoading(true);
             setOffset(offset + 10);
