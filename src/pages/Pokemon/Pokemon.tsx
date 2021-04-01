@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,6 +7,8 @@ import * as Progress from 'react-native-progress';
 
 import { RouteParams } from '../../routes';
 import api from '../../services/api';
+import TypeBadge from '../../components/TypeBadge/TypeBadge';
+
 import { pokemonColorTypes } from '../../constants/pokemonTypes';
 
 type PokemonScreenRouteProp = RouteProp<RouteParams, 'Pokemon'>;
@@ -41,18 +43,30 @@ type PokemonDataType = {
   moves: [];
   stats: StatType[];
   types: AttributeType[];
+  flavor_text: string;
 };
 
 import { Container, PokemonName } from './styles';
 
 const Pokemon: React.FC = ({ route, navigation }: Props) => {
-  const [pokemonData, setPokemonData] = useState<PokemonDataType>();
+  const [pokemonData, setPokemonData] = useState<PokemonDataType>({
+    id: 0,
+    abilities: [],
+    moves: [],
+    stats: [],
+    name: '',
+    types: [],
+    flavor_text: '',
+  });
   const [pokemonColor, setPokemonColor] = useState('');
 
   const getPokemonColor = (pokemonType: string) => {
     return pokemonColorTypes[pokemonType as keyof typeof pokemonColorTypes];
   };
 
+  /**
+   * GET POKEMON DATA
+   */
   useEffect(() => {
     const pokemonName = route.params.pokemonName;
     api
@@ -60,10 +74,26 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
       .then(result => setPokemonData(result.data));
   }, []);
 
+  /**
+   * SET POKEMON PRIMARY COLOR
+   */
   useEffect(() => {
-    const color = getPokemonColor(pokemonData?.types[0].type.name as string);
-    console.log(color);
-    setPokemonColor(color);
+    if (pokemonData.types.length > 0) {
+      const color = getPokemonColor(pokemonData?.types[0].type.name as string);
+      setPokemonColor(color);
+    }
+  }, [pokemonData]);
+
+  /**
+   * GET FLAVOR TEXT OF POKEMON
+   */
+  useEffect(() => {
+    api.get(`pokemon-species/${pokemonData?.id}`).then(result => {
+      setPokemonData({
+        ...pokemonData,
+        flavor_text: result.data.flavor_text_entries[8].flavor_text,
+      });
+    });
   }, [pokemonData]);
 
   return (
@@ -78,9 +108,23 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
           />
           <PokemonName>{pokemonData.name}</PokemonName>
 
-          {pokemonData.types.map(attribute => (
-            <Text>{attribute.type.name}</Text>
-          ))}
+          <View>
+            <Text>{pokemonData.flavor_text}</Text>
+          </View>
+
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'row',
+            }}
+          >
+            {pokemonData.types.map(attribute => (
+              <TypeBadge backgroundColor={getPokemonColor(attribute.type.name)}>
+                {attribute.type.name}
+              </TypeBadge>
+            ))}
+          </View>
 
           {pokemonData.stats.map(stat => (
             <Text>

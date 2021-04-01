@@ -1,10 +1,18 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { ReactNode } from 'react';
+import { Text } from 'react-native';
 
-// import { Container } from './styles';
+import { Container, BadgeName } from './styles';
 
-const TypeBadge: React.FC = () => {
-  return <View />;
+type TypeBadgeProps = {
+  backgroundColor: string;
+};
+
+const TypeBadge: React.FC<TypeBadgeProps> = ({ backgroundColor, children }) => {
+  return (
+    <Container backgroundColor={backgroundColor ? backgroundColor : '#fff'}>
+      <BadgeName>{children}</BadgeName>
+    </Container>
+  );
 };
 
 export default TypeBadge;

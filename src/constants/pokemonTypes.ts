@@ -4,6 +4,7 @@ enum pokemonColorTypes {
   bug = '#9DC130',
   electric = '#EDD53F',
   grass = '#5DBE62',
+  poison = '#B563CE',
 }
 
 export { pokemonColorTypes };
