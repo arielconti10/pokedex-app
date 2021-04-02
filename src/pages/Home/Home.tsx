@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigation } from '@react-navigation/native';
+
 import { ActivityIndicator, Image, Text } from 'react-native';
 import {
   TextInput,
@@ -12,7 +14,6 @@ import api from '../../services/api';
 
 import { Container, SearchBar, Title } from './styles';
 import { DebouncedFunc, lowerCase } from 'lodash';
-import { useNavigation } from '@react-navigation/native';
 
 interface Pokemon {
   name: string;
