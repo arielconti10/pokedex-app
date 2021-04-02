@@ -60,6 +60,8 @@ import {
   StatValue,
 } from './styles';
 
+import electric from '../../assets/icons/electric.png';
+
 const Pokemon: React.FC = ({ route, navigation }: Props) => {
   const [pokemonData, setPokemonData] = useState<PokemonDataType>({
     id: 0,

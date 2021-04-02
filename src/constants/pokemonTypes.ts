@@ -10,7 +10,7 @@ enum pokemonColorTypes {
   dark = '#5F606D',
   dragon = '#0773C7',
   fairy = '#EF97E6',
-  fight = '#D94256',
+  fighting = '#D94256',
   ghost = '#6970C5',
   ground = '#D78555',
   ice = '#7ED4C9',
