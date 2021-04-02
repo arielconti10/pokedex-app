@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -46,7 +47,18 @@ type PokemonDataType = {
   flavor_text: string;
 };
 
-import { Container, PokemonName } from './styles';
+import {
+  Container,
+  PokemonContainer,
+  PokemonName,
+  PokemonData,
+  PokemonDescription,
+  BadgesTypeContainer,
+  Stats,
+  StatContainer,
+  StatName,
+  StatValue,
+} from './styles';
 
 const Pokemon: React.FC = ({ route, navigation }: Props) => {
   const [pokemonData, setPokemonData] = useState<PokemonDataType>({
@@ -96,50 +108,90 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
     });
   }, [pokemonData]);
 
+  const getAttributeShortName = attribute => {
+    switch (attribute) {
+      case 'attack':
+        return 'AKT';
+      case 'defense':
+        return 'DEF';
+      case 'special-attack':
+        return 'SATK';
+      case 'special-defense':
+        return 'SDEF';
+      case 'speed':
+        return 'SPD';
+      default:
+        return attribute;
+    }
+  };
+
   return (
     <Container>
       {pokemonData && (
-        <>
+        <PokemonContainer backgroundColor={pokemonColor ? pokemonColor : ''}>
           <Image
-            style={{ width: 128, height: 128, alignSelf: 'center' }}
+            style={{
+              width: 128,
+              height: 128,
+              alignSelf: 'center',
+              marginBottom: -20,
+              zIndex: 1,
+            }}
             source={{
               uri: `https://img.pokemondb.net/sprites/home/normal/${pokemonData.name}.png`,
             }}
           />
-          <PokemonName>{pokemonData.name}</PokemonName>
 
-          <View>
-            <Text>{pokemonData.flavor_text}</Text>
-          </View>
+          <PokemonData>
+            <PokemonName>{pokemonData.name}</PokemonName>
+            <BadgesTypeContainer>
+              {pokemonData.types.map(attribute => (
+                <TypeBadge
+                  backgroundColor={getPokemonColor(attribute.type.name)}
+                >
+                  {getAttributeShortName(attribute.type.name)}
+                </TypeBadge>
+              ))}
+            </BadgesTypeContainer>
 
-          <View
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              flexDirection: 'row',
-            }}
-          >
-            {pokemonData.types.map(attribute => (
-              <TypeBadge backgroundColor={getPokemonColor(attribute.type.name)}>
-                {attribute.type.name}
-              </TypeBadge>
-            ))}
-          </View>
+            <PokemonDescription>
+              {pokemonData.flavor_text
+                ? pokemonData.flavor_text.replace(/\s+/g, ' ').trim()
+                : ''}
+            </PokemonDescription>
 
-          {pokemonData.stats.map(stat => (
-            <Text>
-              {stat.stat.name}
-              {stat.base_stat}
-              <Progress.Bar
-                height={10}
-                color={pokemonColor}
-                progress={stat.base_stat / 100}
-                width={200}
-                useNativeDriver={true}
-              />
-            </Text>
-          ))}
-        </>
+            <Stats>
+              {pokemonData.stats.map(stat => (
+                <StatContainer>
+                  <View
+                    style={{
+                      width: 70,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginRight: 30,
+                    }}
+                  >
+                    <StatName
+                      backgroundColor={pokemonColor ? pokemonColor : '#fff'}
+                    >
+                      {getAttributeShortName(stat.stat.name)}
+                    </StatName>
+                    <StatValue>{stat.base_stat}</StatValue>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Progress.Bar
+                      color={pokemonColor}
+                      progress={stat.base_stat / 100}
+                      width={240}
+                      height={15}
+                      borderRadius={20}
+                    />
+                  </View>
+                </StatContainer>
+              ))}
+            </Stats>
+          </PokemonData>
+        </PokemonContainer>
       )}
     </Container>
   );
