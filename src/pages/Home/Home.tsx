@@ -69,26 +69,35 @@ const Home: React.FC = () => {
     }
   };
 
-  const renderPokemon = (result: { item: Pokemon }) => (
-    <TouchableOpacity
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-      onPress={() => {
-        navigation.navigate('Pokemon', { pokemonName: result.item.name });
-      }}
-    >
-      <Image
-        style={{ width: 80, height: 80 }}
-        source={{
-          uri: `https://img.pokemondb.net/sprites/home/normal/${result.item.name}.png`,
+  const renderPokemon = (result: { item: Pokemon }) => {
+    let pokeId = result.index + 1;
+    pokeId = pokeId.toString();
+    if (pokeId < 10) {
+      pokeId = '00' + pokeId;
+    } else if (pokeId >= 10 && pokeId < 100) {
+      pokeId = '0' + pokeId;
+    }
+    return (
+      <TouchableOpacity
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
         }}
-      />
-      <Text>{capitalize(result.item.name)}</Text>
-    </TouchableOpacity>
-  );
+        onPress={() => {
+          navigation.navigate('Pokemon', { pokemonName: result.item.name });
+        }}
+      >
+        <Image
+          style={{ width: 70, height: 70 }}
+          source={{
+            uri: `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${pokeId}.png`,
+          }}
+        />
+        <Text>{capitalize(result.item.name)}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const handleChangeSearch = (value: string) => {
     setSearchString(value);
@@ -122,9 +131,9 @@ const Home: React.FC = () => {
 
       {!searchedPokemon ? (
         <FlatList
-          keyExtractor={item => item.name}
+          keyExtractor={(item, index) => index.toString()}
           data={pokemonList}
-          renderItem={renderPokemon}
+          renderItem={item => renderPokemon(item)}
           onEndReachedThreshold={0}
           onEndReached={() => {
             setTimeout(() => {

@@ -46,7 +46,7 @@ export const BadgesTypeContainer = styled.View`
 `;
 
 export const Stats = styled.View`
-  margin-top: 20px;
+  margin: 20px 0;
   display: flex;
 `;
 
@@ -54,7 +54,7 @@ export const StatContainer = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 `;
 
 export const StatName = styled.Text<PokemonProps>`

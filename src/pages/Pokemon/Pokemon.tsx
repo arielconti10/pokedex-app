@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { Image, View, Text, Dimensions } from 'react-native';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -8,6 +8,7 @@ import * as Progress from 'react-native-progress';
 
 import { RouteParams } from '../../routes';
 import api from '../../services/api';
+import { getAttributeShortName } from '../../helpers';
 import TypeBadge from '../../components/TypeBadge/TypeBadge';
 
 import { pokemonColorTypes } from '../../constants/pokemonTypes';
@@ -78,14 +79,20 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
     return pokemonColorTypes[pokemonType as keyof typeof pokemonColorTypes];
   };
 
+  const getLength = (number: number) => {
+    return number.toString().length;
+  };
+
   /**
    * GET POKEMON DATA
    */
   useEffect(() => {
     const pokemonName = route.params.pokemonName;
-    api
-      .get(`pokemon/${pokemonName}`)
-      .then(result => setPokemonData(result.data));
+    api.get(`pokemon/${pokemonName}`).then(result => {
+      const pokemonData = result.data;
+
+      setPokemonData(pokemonData);
+    });
   }, []);
 
   /**
@@ -110,22 +117,23 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
     });
   }, [pokemonData]);
 
-  const getAttributeShortName = attribute => {
-    switch (attribute) {
-      case 'attack':
-        return 'AKT';
-      case 'defense':
-        return 'DEF';
-      case 'special-attack':
-        return 'SATK';
-      case 'special-defense':
-        return 'SDEF';
-      case 'speed':
-        return 'SPD';
-      default:
-        return attribute;
-    }
-  };
+  const initialLayout = { width: Dimensions.get('window').width };
+
+  const [index, setIndex] = React.useState(0);
+
+  const [routes] = React.useState([
+    { key: 'first', title: 'Stats' },
+    { key: 'second', title: 'Evolutions' },
+    { key: 'third', title: 'Moves' },
+  ]);
+
+  const renderScene = SceneMap({
+    first: () => (
+      <StatsTabs pokemonData={pokemonData} pokemonColor={pokemonColor} />
+    ),
+    second: EvolutionTabs,
+    third: MovesTabs,
+  });
 
   return (
     <Container>
@@ -133,14 +141,18 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
         <PokemonContainer backgroundColor={pokemonColor ? pokemonColor : ''}>
           <Image
             style={{
-              width: 128,
-              height: 128,
+              width: 170,
+              height: 170,
               alignSelf: 'center',
-              marginBottom: -20,
+              marginBottom: -40,
               zIndex: 1,
             }}
             source={{
-              uri: `https://img.pokemondb.net/sprites/home/normal/${pokemonData.name}.png`,
+              uri: `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${
+                pokemonData.id.toString().length <= 2
+                  ? '00' + pokemonData.id
+                  : pokemonData.id
+              }.png`,
             }}
           />
 
@@ -162,36 +174,47 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
                 : ''}
             </PokemonDescription>
 
-            <Stats>
-              {pokemonData.stats.map(stat => (
-                <StatContainer>
-                  <View
-                    style={{
-                      width: 70,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginRight: 30,
-                    }}
-                  >
-                    <StatName
-                      backgroundColor={pokemonColor ? pokemonColor : '#fff'}
+            <TabView
+              navigationState={{ index, routes }}
+              renderScene={renderScene}
+              onIndexChange={setIndex}
+              initialLayout={initialLayout}
+              renderTabBar={props => (
+                <TabBar
+                  renderLabel={({ route, focused, color }) => (
+                    <Text
+                      style={{ color, margin: 0, textTransform: 'uppercase' }}
                     >
-                      {getAttributeShortName(stat.stat.name)}
-                    </StatName>
-                    <StatValue>{stat.base_stat}</StatValue>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Progress.Bar
-                      color={pokemonColor}
-                      progress={stat.base_stat / 100}
-                      width={240}
-                      height={15}
-                      borderRadius={20}
-                    />
-                  </View>
-                </StatContainer>
-              ))}
-            </Stats>
+                      {route.title}
+                    </Text>
+                  )}
+                  indicatorStyle={{
+                    borderRadius: 100,
+                    height: '100%',
+                    backgroundColor: pokemonColor ? pokemonColor : '#fff',
+                    borderWidth: 2,
+                    borderColor: pokemonColor ? pokemonColor : '#fff',
+                    shadowColor: pokemonColor,
+                    elevation: 1,
+                    shadowOffset: {
+                      width: 1,
+                      height: 1,
+                    },
+                    shadowOpacity: 1,
+                    shadowRadius: 2,
+                  }}
+                  activeColor={pokemonColor ? '#fff' : pokemonColor}
+                  inactiveColor={pokemonColor ? pokemonColor : '#919191'}
+                  {...props}
+                  style={{
+                    backgroundColor: '#fff',
+                    padding: 0,
+                    margin: 0,
+                    borderBottomWidth: 0,
+                  }}
+                />
+              )}
+            />
           </PokemonData>
         </PokemonContainer>
       )}
@@ -200,3 +223,46 @@ const Pokemon: React.FC = ({ route, navigation }: Props) => {
 };
 
 export default Pokemon;
+
+const StatsTabs = (props: {
+  pokemonData: PokemonDataType;
+  pokemonColor: string;
+}) => {
+  const { pokemonData, pokemonColor } = props;
+  return (
+    <Stats>
+      {pokemonData.stats.map(stat => (
+        <StatContainer>
+          <View
+            style={{
+              width: 70,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginRight: 30,
+            }}
+          >
+            <StatName backgroundColor={pokemonColor ? pokemonColor : '#fff'}>
+              {getAttributeShortName(stat.stat.name)}
+            </StatName>
+            <StatValue>{stat.base_stat}</StatValue>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Progress.Bar
+              color={pokemonColor}
+              progress={stat.base_stat / 100}
+              width={240}
+              height={15}
+              borderRadius={20}
+            />
+          </View>
+        </StatContainer>
+      ))}
+    </Stats>
+  );
+};
+
+const EvolutionTabs = () => (
+  <View style={{ flex: 1, backgroundColor: 'blue' }} />
+);
+
+const MovesTabs = () => <View style={{ flex: 1, backgroundColor: 'yellow' }} />;
