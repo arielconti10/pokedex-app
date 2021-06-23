@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Image, View, Text, Dimensions } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 
@@ -134,10 +134,8 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
   ]);
 
   const renderScene = SceneMap({
-    first: () => (
-      <Stats pokemonData={pokemonData} pokemonColor={pokemonColor} />
-    ),
-    second: () => <Evolutions pokemonId={pokemonData.id} />,
+    first: useCallback(() => <Stats pokemonData={pokemonData} pokemonColor={pokemonColor} />, [],),
+    second: useCallback(() => <Evolutions pokemonId={pokemonData.id} />, []),
     third: MovesTabs,
   });
 
@@ -192,8 +190,6 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
             </PokemonDescription>
 
             <TabView
-              tabBarPosition="top"
-              lazy={true}
               navigationState={{ index, routes }}
               renderScene={renderScene}
               onIndexChange={setIndex}

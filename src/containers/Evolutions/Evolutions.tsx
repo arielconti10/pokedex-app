@@ -9,28 +9,47 @@ interface Props {
   pokemonId: number;
 }
 
+type Evolution = {
+  species: {
+    name: string,
+    url: string
+  }
+}
+
+type EvolutionChain = {
+  chain: {
+    evolves_to: Evolution[]
+  }
+}
+
 const Evolutions: React.FC<Props> = props => {
   const { pokemonId } = props;
 
-  const [evolutions, setEvolutions] = useState();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [evolutions, setEvolutions] = useState<EvolutionChain>();
 
   useEffect(() => {
-    api.get(`evolution-chain/${pokemonId}`).then(result => {
-      const evolutions = result.data;
-      setEvolutions(evolutions);
-    });
+    const fetchPokemonEvolutions = async () => {
+      setLoading(true);
+      const result = await api.get(`evolution-chain/${pokemonId}`)
+      setEvolutions(result.data)
+    }
+    if(pokemonId){
+      fetchPokemonEvolutions();
+      setLoading(false);
+    }
   }, []);
 
-  // if(evolutions){
-  //   console.log(evolutions.chain.evolves_to)
-  // }
 
   return (
     <View>
-      {evolutions ? (
-        <View />
-      ) : // <Text>{evolutions?.chain.evolvest_to[0].species.name}</Text>
-      null}
+      {evolutions?.chain ? (
+        <View>
+          <Text>{evolutions.chain.evolves_to[0].species.name}</Text>
+        </View>
+      ) : null}
+
+      
     </View>
   );
 };
