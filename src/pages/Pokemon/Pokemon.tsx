@@ -202,7 +202,7 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
                 <TabBar
                   renderLabel={({ route, focused, color }) => (
                     <Text
-                      style={{ color, margin: 0, textTransform: 'uppercase' }}
+                      style={{ color: color ? color : '#fff', margin: 0, textTransform: 'uppercase' }}
                     >
                       {route.title}
                     </Text>
