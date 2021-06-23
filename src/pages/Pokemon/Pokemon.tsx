@@ -88,15 +88,17 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     setLoading(true);
     const pokemonName = route.params.pokemonName;
-    api.get(`pokemon/${pokemonName}`).then(result => {
-      const pokemonData = result.data;
+    api
+      .get(`pokemon/${pokemonName}`)
+      .then(result => {
+        const pokemonData = result.data;
 
-      setPokemonData(pokemonData);
-      setLoading(false);
-    }).catch(exception => {
-      console.log(exception)
-    });
-    
+        setPokemonData(pokemonData);
+        setLoading(false);
+      })
+      .catch(exception => {
+        console.log(exception);
+      });
   }, []);
 
   /**
@@ -113,13 +115,16 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
    * GET FLAVOR TEXT OF POKEMON
    */
   useEffect(() => {
-    if(pokemonData.id){
-      api.get(`pokemon-species/${pokemonData.id}`).then(result => {
-        setPokemonData({
-          ...pokemonData,
-          flavor_text: result.data.flavor_text_entries[8].flavor_text,
-        });
-      }).catch(exception => console.log(exception));
+    if (pokemonData.id) {
+      api
+        .get(`pokemon-species/${pokemonData.id}`)
+        .then(result => {
+          setPokemonData({
+            ...pokemonData,
+            flavor_text: result.data.flavor_text_entries[8].flavor_text,
+          });
+        })
+        .catch(exception => console.log(exception));
     }
   }, [pokemonData]);
 
@@ -134,8 +139,13 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
   ]);
 
   const renderScene = SceneMap({
-    first: useCallback(() => <Stats pokemonData={pokemonData} pokemonColor={pokemonColor} />, [],),
-    second: useCallback(() => <Evolutions pokemonId={pokemonData.id} />, []),
+    first: useCallback(
+      () => <Stats pokemonData={pokemonData} pokemonColor={pokemonColor} />,
+      [pokemonData],
+    ),
+    second: useCallback(() => <Evolutions pokemonId={pokemonData.id} />, [
+      pokemonData.id,
+    ]),
     third: MovesTabs,
   });
 
@@ -198,7 +208,11 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
                 <TabBar
                   renderLabel={({ route, focused, color }) => (
                     <Text
-                      style={{ color: color ? color : '#fff', margin: 0, textTransform: 'uppercase' }}
+                      style={{
+                        color: color ? color : '#fff',
+                        margin: 0,
+                        textTransform: 'uppercase',
+                      }}
                     >
                       {route.title}
                     </Text>
