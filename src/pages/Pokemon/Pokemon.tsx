@@ -72,14 +72,12 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
     flavor_text: '',
   });
 
+  const [evolutionChainUrl, setEvolutionChainUrl] = useState<string>('');
+
   const [pokemonColor, setPokemonColor] = useState('');
 
   const getPokemonColor = (pokemonType: string) => {
     return pokemonColorTypes[pokemonType as keyof typeof pokemonColorTypes];
-  };
-
-  const getLength = (number: number) => {
-    return number.toString().length;
   };
 
   /**
@@ -95,6 +93,12 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
 
         setPokemonData(pokemonData);
         setLoading(false);
+
+        const speciesRequest = result.data.species.url;
+        return api.get(speciesRequest);
+      })
+      .then(result => {
+        setEvolutionChainUrl(result.data.evolution_chain.url);
       })
       .catch(exception => {
         console.log(exception);
@@ -143,9 +147,15 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
       () => <Stats pokemonData={pokemonData} pokemonColor={pokemonColor} />,
       [pokemonData],
     ),
-    second: useCallback(() => <Evolutions pokemonId={pokemonData.id} />, [
-      pokemonData.id,
-    ]),
+    second: useCallback(
+      () => (
+        <Evolutions
+          pokemonId={pokemonData.id}
+          evolutionChain={evolutionChainUrl}
+        />
+      ),
+      [pokemonData.id, evolutionChainUrl],
+    ),
     third: MovesTabs,
   });
 
