@@ -5,7 +5,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getAttributeShortName } from '../../helpers';
+import { getAttributeShortName, getPokemonId } from '../../helpers';
 import { RouteParams } from '../../routes';
 import api from '../../services/api';
 
@@ -149,20 +149,6 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
     third: MovesTabs,
   });
 
-  const getPokemonId = () => {
-    let pokemonId;
-    if (pokemonData) {
-      pokemonId = pokemonData.id.toString();
-      if (pokemonData.id < 10) {
-        pokemonId = '00' + pokemonId;
-      } else if (pokemonData.id >= 10 && pokemonData.id < 100) {
-        pokemonId = '0' + pokemonId;
-      }
-    }
-
-    return pokemonId;
-  };
-
   return (
     <Container>
       {pokemonData && !loading && (
@@ -176,7 +162,9 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
               zIndex: 1,
             }}
             source={{
-              uri: `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${getPokemonId()}.png`,
+              uri: `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${getPokemonId(
+                pokemonData,
+              )}.png`,
             }}
           />
 

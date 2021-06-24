@@ -18,3 +18,17 @@ export const getAttributeShortName = (attribute: string) => {
   }
   return attribute;
 };
+
+export const getPokemonId = (pokemonData: any) => {
+  let pokemonId;
+  if (pokemonData) {
+    pokemonId = pokemonData.id.toString();
+    if (pokemonData.id < 10) {
+      pokemonId = '00' + pokemonId;
+    } else if (pokemonData.id >= 10 && pokemonData.id < 100) {
+      pokemonId = '0' + pokemonId;
+    }
+  }
+
+  return pokemonId;
+};
