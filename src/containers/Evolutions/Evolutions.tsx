@@ -80,7 +80,7 @@ const Evolutions: React.FC<Props> = props => {
         alignItems: 'center',
       }}
     >
-      {evolutions && evolutions.length
+      {!loading && evolutions && evolutions.length
         ? evolutions.map(evolution => {
             return (
               <View key={evolution.id} style={{ alignItems: 'center' }}>
