@@ -13,7 +13,7 @@ const TypeBadge: React.FC<TypeBadgeProps> = ({ backgroundColor, children }) => {
 
   return (
     <Container backgroundColor={backgroundColor ? backgroundColor : '#fff'}>
-      <Image source={icon} resizeMode="contain" style={{ width: 10 }} />
+      <Image source={icon} resizeMode="contain" style={{ width: 16 }} />
       <BadgeName>{children}</BadgeName>
     </Container>
   );

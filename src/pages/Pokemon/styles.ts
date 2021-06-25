@@ -1,15 +1,16 @@
 import styled from 'styled-components/native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
-interface PokemonProps {
-  backgroundColor: string;
+interface PokemonProps { 
+  bgColor: string;
 }
 
 export const Container = styled.View`
   display: flex;
 `;
 
-export const PokemonContainer = styled.View`
+export const PokemonContainer = styled.View<PokemonProps>`
+  background-color: ${props => props.bgColor};
   padding-top: ${getStatusBarHeight() + 24}px;
 `;
 
@@ -43,27 +44,4 @@ export const BadgesTypeContainer = styled.View`
   display: flex;
   justify-content: center;
   flex-direction: row;
-`;
-
-export const Stats = styled.View`
-  margin-top: 20px;
-  display: flex;
-`;
-
-export const StatContainer = styled.View`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 10px;
-`;
-
-export const StatName = styled.Text<PokemonProps>`
-  font-weight: 600;
-  text-transform: uppercase;
-  color: ${props => props.backgroundColor};
-`;
-
-export const StatValue = styled.Text`
-  font-weight: 600;
-  color: #666666;
 `;
