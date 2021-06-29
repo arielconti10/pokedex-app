@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, ScrollView } from 'react-native';
+import { Text, View, ScrollView, Image } from 'react-native';
 import api from '../../services/api';
+import { pokemonTypeIcons } from '../../constants/pokemonTypeIcons';
 
-// import { Container } from './styles';
+import { Row } from './styles';
 
 type Move = {
   is_hidden: boolean;
@@ -10,8 +11,13 @@ type Move = {
   url: string;
 };
 
+type MoveType = {
+  name: string;
+  url: string;
+};
+
 interface MoveDetails extends Move {
-  type: [];
+  type: MoveType;
   name: string;
   power: number;
   id: number;
@@ -51,11 +57,16 @@ const Moves: React.FC<Props> = props => {
 
   return (
     <ScrollView>
-      {movesDetails.map(move => (
-        <View key={move.name}>
-          <Text>{move.name}</Text>
-        </View>
-      ))}
+      {movesDetails.map(move => {
+        const icon = pokemonTypeIcons.normal;
+
+        return (
+          <Row key={move.name}>
+            <Text>{move.name}</Text>
+            <Image source={icon} resizeMode="contain" style={{ width: 16 }} />
+          </Row>
+        );
+      })}
     </ScrollView>
   );
 };

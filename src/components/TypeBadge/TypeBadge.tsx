@@ -10,7 +10,6 @@ type TypeBadgeProps = {
 
 const TypeBadge: React.FC<TypeBadgeProps> = ({ backgroundColor, children }) => {
   const icon = pokemonTypeIcons[children];
-
   return (
     <Container backgroundColor={backgroundColor ? backgroundColor : '#fff'}>
       <Image source={icon} resizeMode="contain" style={{ width: 16 }} />

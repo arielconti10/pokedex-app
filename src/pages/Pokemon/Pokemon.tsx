@@ -157,14 +157,10 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
       ),
       [pokemonData.id, evolutionChainUrl],
     ),
-    third: useCallback(
-      () => (
-        <Moves
-          moves={pokemonData.moves}
-        />
-      ),
-      [pokemonData.id, evolutionChainUrl],
-    ),
+    third: useCallback(() => <Moves moves={pokemonData.moves} />, [
+      pokemonData.id,
+      evolutionChainUrl,
+    ]),
   });
 
   return (
@@ -194,7 +190,7 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
                   key={attribute.type.name}
                   backgroundColor={getPokemonColor(attribute.type.name)}
                 >
-                  {getAttributeShortName(attribute.type.name)}
+                  {attribute.type.name}
                 </TypeBadge>
               ))}
             </BadgesTypeContainer>
