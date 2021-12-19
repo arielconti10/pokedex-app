@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
-interface PokemonProps { 
+interface PokemonProps {
   bgColor: string;
 }
 
@@ -37,7 +37,8 @@ export const PokemonDescription = styled.Text`
   font-size: 14px;
   text-align: left;
   color: #4f4f4f;
-  margin: 30px 0;
+  margin: 10px 0;
+  line-height: 25px;
 `;
 
 export const BadgesTypeContainer = styled.View`

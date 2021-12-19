@@ -12,6 +12,7 @@ import api from '../../services/api';
 import TypeBadge from '../../components/TypeBadge/TypeBadge';
 import Stats from '../../containers/Stats/Stats';
 import Evolutions from '../../containers/Evolutions/Evolutions';
+import Moves from '../../containers/Moves/Moves';
 
 import { pokemonColorTypes } from '../../constants/pokemonTypes';
 
@@ -156,7 +157,10 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
       ),
       [pokemonData.id, evolutionChainUrl],
     ),
-    third: MovesTabs,
+    third: useCallback(() => <Moves moves={pokemonData.moves} />, [
+      pokemonData.id,
+      evolutionChainUrl,
+    ]),
   });
 
   return (
@@ -186,7 +190,7 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
                   key={attribute.type.name}
                   backgroundColor={getPokemonColor(attribute.type.name)}
                 >
-                  {getAttributeShortName(attribute.type.name)}
+                  {attribute.type.name}
                 </TypeBadge>
               ))}
             </BadgesTypeContainer>
