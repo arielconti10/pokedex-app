@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Image, View, Text, Dimensions } from 'react-native';
+import { Image, View, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 
 import { RouteProp } from '@react-navigation/native';
@@ -165,7 +165,9 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <Container>
-      {pokemonData && !loading && (
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
         <PokemonContainer bgColor={pokemonColor ? pokemonColor : '#fff'}>
           <Image
             style={{
@@ -200,7 +202,6 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
                 ? pokemonData.flavor_text.replace(/\s+/g, ' ').trim()
                 : ''}
             </PokemonDescription>
-
             <TabView
               navigationState={{ index, routes }}
               renderScene={renderScene}
@@ -243,7 +244,12 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
                   }}
                 />
               )}
+              renderLazyPlaceholder={() => <ActivityIndicator />}
+              tabBarPosition="top"
+              lazy
+              lazyPreloadDistance={0}
             />
+
           </PokemonData>
         </PokemonContainer>
       )}
@@ -252,9 +258,3 @@ const Pokemon: React.FC<Props> = ({ route, navigation }) => {
 };
 
 export default Pokemon;
-
-const EvolutionTabs = () => (
-  <View style={{ flex: 1, backgroundColor: 'blue' }} />
-);
-
-const MovesTabs = () => <View style={{ flex: 1, backgroundColor: 'yellow' }} />;
